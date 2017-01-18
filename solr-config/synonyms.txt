@@ -1,5 +1,4 @@
-# https://gist.github.com/bradfordcp/562776
-
+# Generated Using: https://gist.github.com/bradfordcp/562776
 a, adenine, amp, ampere, angstrom, axerophthol
 aachen, aken
 aalborg, alborg
