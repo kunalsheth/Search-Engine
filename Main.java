@@ -38,7 +38,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         final PrintWriter error;
-        try {6
+        try {
             error = new PrintWriter(new FileWriter("errlog.txt"));
             System.out.println("Initializing URL Store");
             UrlStore.init(getSeed(), new File("store"), 4_000_000_000L, 1_000_000_000, TimeUnit.DAYS.toMillis(7));
@@ -48,7 +48,7 @@ public class Main {
         urlStore = UrlStore.getInstance();
 
         System.out.println("Initializing Solr Manager");
-        SolrManager.init("http://localhost:2357/solr/www", 1000, 2, TimeUnit.MINUTES.toMillis(3));
+        SolrManager.init("http://localhost:8983/solr/www", 1000, 2, TimeUnit.MINUTES.toMillis(3));
         solrManager = SolrManager.getInstance();
 
         System.out.println("Initializing CURL Store");
