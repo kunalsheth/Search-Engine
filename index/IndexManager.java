@@ -79,7 +79,7 @@ public class IndexManager {
         formatText(document.getElementsByTag("u").stream())
                 .forEach(e -> index.addField("u", e));
 
-        formatText(formatText(document.getElementsByTag("i").stream())
+        formatText(document.getElementsByTag("i").stream())
                 .forEach(e -> index.addField("i", e));
 
         int i = 0;
