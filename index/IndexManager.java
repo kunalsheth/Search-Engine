@@ -92,34 +92,59 @@ public class IndexManager {
 
         document.getElementsByTag("em").stream()
                 .map(Element::text)
-                .map(string -> string.replaceAll("\\s+", " "))
-                .map(String::trim)
-                .filter(string -> !(string.length() < 3))
-                .map(IndexManager::truncateToLength)
+public class IndexManager {
+
+    private static final int fieldLength = 5000;
+
+    public static Document parse(String url, InputStream input) {
+        try {
+            return Jsoup.parse(input, null, url);
+        } catch (IOException | IllegalArgumentException e) {
+            System.err.print("\n" + e.getMessage() + "\n");
+            return null;
+        }
+    }
+
+    public static Triple<SolrInputDocument, Collection<String>, Collection<String>> index(Document document) {
+        final SolrInputDocument index = new SolrInputDocument();
+        index.setField("id", document.location());
+        index.setField("time", String.valueOf(System.currentTimeMillis()));
+        index.setField("title", document.title());
+
+        final Set<String> links =
+                document.select("a[href]").stream()
+                        .map(e -> e.attr("abs:href"))
+                        .collect(Collectors.toSet());
+        final Set<String> media =
+                document.select("[src]").stream()
+                        .map(e -> e.attr("abs:src"))
+                        .collect(Collectors.toSet());
+
+        links.forEach(link -> index.addField("link", link));
+        media.forEach(link -> index.addField("media", link));
+
+        formatText(document.getElementsByTag("h1").stream())
+                .forEach(e -> index.addField("h1", e));
+
+        formatText(document.getElementsByTag("h2").stream())
+                .forEach(e -> index.addField("h2", e));
+
+        formatText(document.getElementsByTag("h3").stream())
+                .forEach(e -> index.addField("h3", e));
+
+        formatText(document.getElementsByTag("strong").stream())
+                .forEach(e -> index.addField("strong", e));
+
+        formatText(document.getElementsByTag("em").stream())
                 .forEach(e -> index.addField("em", e));
 
-        document.getElementsByTag("b").stream()
-                .map(Element::text)
-                .map(string -> string.replaceAll("\\s+", " "))
-                .map(String::trim)
-                .filter(string -> !(string.length() < 3))
-                .map(IndexManager::truncateToLength)
+        formatText(document.getElementsByTag("b").stream())
                 .forEach(e -> index.addField("b", e));
 
-        document.getElementsByTag("u").stream()
-                .map(Element::text)
-                .map(string -> string.replaceAll("\\s+", " "))
-                .map(String::trim)
-                .filter(string -> !(string.length() < 3))
-                .map(IndexManager::truncateToLength)
+        formatText(document.getElementsByTag("u").stream())
                 .forEach(e -> index.addField("u", e));
 
-        document.getElementsByTag("i").stream()
-                .map(Element::text)
-                .map(string -> string.replaceAll("\\s+", " "))
-                .map(String::trim)
-                .filter(string -> !(string.length() < 3))
-                .map(IndexManager::truncateToLength)
+        formatText(formatText(document.getElementsByTag("i").stream())
                 .forEach(e -> index.addField("i", e));
 
         int i = 0;
@@ -127,6 +152,14 @@ public class IndexManager {
         for (String chunk : text) index.addField(++i + "_text", chunk);
 
         return Triple.of(index, links, media);
+    }
+
+    private static Stream<String> formatText(final Stream<Element> elements) {
+        return elements.map(Element::text)
+                .map(string -> string.replaceAll("\\s+", " "))
+                .map(String::trim)
+                .filter(string -> !(string.length() < 3))
+                .map(IndexManager::truncateToLength);
     }
 
     private static List<String> chunkToLength(String text) {
