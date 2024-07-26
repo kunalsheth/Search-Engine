@@ -1,5 +1,8 @@
+For context, I made this in 8th grade.
+
+
 # Search-Engine
-## A rudimentary mock-up of Google
+## A rudimentary attempt at making "Google"
 
 ### Getting Started:  
   1. Download Apache Solr  
